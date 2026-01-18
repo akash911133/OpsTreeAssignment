@@ -1,0 +1,50 @@
+name: Deploy to Minikube
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Minikube
+        uses: manusa/actions-setup-minikube@v2.11.0
+        with:
+          minikube-version: v1.33.1
+          kubernetes-version: v1.30.0
+          driver: docker
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and load app image
+        run: |
+          eval $(minikube -p minikube docker-env)
+          cd app
+          docker build -t hello-app:latest .
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: |
+          cd terraform
+          terraform init
+
+      - name: Terraform Apply
+        run: |
+          cd terraform
+          terraform apply -auto-approve
+
+      - name: Verify deployment
+        run: |
+          # Wait for services to be ready
+          sleep 60
+          APP_URL=$(minikube service hello-service --url)
+          for i in {1..5}; do
+            curl "${APP_URL}/health"
+            echo ""
+          done
+          # Logs should now be in Kibana (search for "healthy" manually post-deploy)
