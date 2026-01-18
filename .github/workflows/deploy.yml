@@ -11,14 +11,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Minikube
-        uses: medyagh/setup-minikube@latest
+      - name: Start Minikube
+        uses: medyagh/setup-minikube@v0.0.20  # or latest known-good tag
         with:
           minikube-version: v1.33.1
           kubernetes-version: v1.30.0
           driver: docker
           start: true
-          cache: true
+          cache: false          # ← often fixes 404
           wait: all
 
       - name: Build and load app image
