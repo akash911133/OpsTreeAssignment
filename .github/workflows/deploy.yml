@@ -17,6 +17,9 @@ jobs:
           minikube-version: v1.33.1
           kubernetes-version: v1.30.0
           driver: docker
+          start: true
+          cache: true
+          wait: all
 
       - name: Build and load app image
         run: |
