@@ -17,7 +17,6 @@ jobs:
           minikube-version: v1.33.1
           kubernetes-version: v1.30.0
           driver: docker
-          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and load app image
         run: |
